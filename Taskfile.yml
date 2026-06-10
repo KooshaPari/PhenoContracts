@@ -1,0 +1,44 @@
+version: "3"
+
+vars:
+  PROJECT: PhenoContracts
+  NODE_VERSION: "22"
+
+tasks:
+  install:
+    desc: "Install dependencies"
+    cmds:
+      - bun install --frozen-lockfile || bun install
+
+  typecheck:
+    desc: "Type-check the TypeScript ports + adapters"
+    cmds:
+      - bunx tsc --noEmit
+
+  lint:
+    desc: "Lint with Biome"
+    cmds:
+      - bunx biome check .
+
+  test:
+    desc: "Run vitest port contract tests"
+    cmds:
+      - bunx vitest run
+
+  build:
+    desc: "Build the TypeScript project"
+    cmds:
+      - bun run build
+
+  quality:
+    desc: "Run full quality gate: typecheck, lint, test, build"
+    cmds:
+      - task: typecheck
+      - task: lint
+      - task: test
+      - task: build
+
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
