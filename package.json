@@ -1,0 +1,21 @@
+{
+  "name": "@phenotype/contracts",
+  "version": "0.1.0",
+  "description": "Phenotype contract verification — formal verification port + Prusti/Kani adapters + contract test bundle",
+  "type": "module",
+  "license": "MIT OR Apache-2.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "test": "vitest run",
+    "build": "tsc",
+    "quality": "tsc --noEmit && biome check . && vitest run"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
