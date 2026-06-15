@@ -1,0 +1,21 @@
+[package]
+name = "phenotype-port-traits"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+description = "Lightweight port trait helpers shared across the Phenotype backend family"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/KooshaPari/PhenoContracts"
+documentation = "https://docs.rs/phenotype-port-traits"
+keywords = ["phenotype", "pheno-contracts", "traits"]
+categories = ["rust-patterns", "development-tools"]
+authors = ["kooshapari"]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
