@@ -1,21 +1,34 @@
-// PhenoContracts ports — barrel re-export for hexagonal interface layer.
-//
-// This file re-exports all public types and constructors so that tests,
-// benchmarks, and adapters import from a stable path (../../index or
-// ../index depending on depth).
-//
-// Adapter side-effect imports: importing `./adapters/*` is what causes each
-// backend to register itself with the registry (see `ports/registry.ts`).
-// Re-exporting them here ensures the registry is populated as soon as any
-// downstream consumer imports the barrel — required for property tests and
-// benchmarks that iterate over `BACKENDS` and call `createVerifier(...)`.
+/**
+ * Centralized adapter registry.
+ *
+ * Maps each {@link Backend} literal to the concrete adapter class that
+ * implements it. Used by port-contract tests, by consumers that want to
+ * resolve a backend string, and by the property tests (which iterate
+ * over every supported backend to verify the contract).
+ */
+import { CoqVerifier } from "./adapters/coq";
+import { KaniVerifier } from "./adapters/kani";
+import { PrustiVerifier } from "./adapters/prusti";
+import type { Backend, ContractVerifier } from "./contract_verifier";
 
-import './adapters/coq';
-import './adapters/kani';
-import './adapters/prusti';
+export const BACKENDS: readonly Backend[] = ["kani", "prusti", "coq"] as const;
 
-export type { Backend, Contract, Verdict, ContractVerifier } from './contract_verifier';
-export { BACKENDS, createVerifier, isBackend, backendNames, registerBackend } from './registry';
-export { CoqVerifier } from './adapters/coq';
-export { KaniVerifier } from './adapters/kani';
-export { PrustiVerifier } from './adapters/prusti';
+export function createVerifier(backend: Backend): ContractVerifier {
+  switch (backend) {
+    case "kani":
+      return new KaniVerifier();
+    case "prusti":
+      return new PrustiVerifier();
+    case "coq":
+      return new CoqVerifier();
+    default: {
+      const _exhaustive: never = backend;
+      throw new Error(`Unknown backend: ${String(_exhaustive)}`);
+    }
+  }
+}
+
+export { CoqVerifier } from "./adapters/coq";
+export { KaniVerifier } from "./adapters/kani";
+export { PrustiVerifier } from "./adapters/prusti";
+export type { Backend, Contract, ContractVerifier, Verdict } from "./contract_verifier";
