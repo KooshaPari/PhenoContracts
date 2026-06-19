@@ -8,8 +8,8 @@
  * Run: `bun run bench`
  */
 import { bench, describe } from "vitest";
-import { BACKENDS, createVerifier } from "../index";
-import type { Contract } from "../index";
+import { BACKENDS, createVerifier } from "../../index";
+import type { Contract } from "../../index";
 
 const sample: Contract = {
   name: "bench_no_overflow",
