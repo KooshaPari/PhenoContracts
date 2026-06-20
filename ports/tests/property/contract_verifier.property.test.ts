@@ -8,10 +8,10 @@
  * This file is the TypeScript analogue of `ports/tests/property/...`
  * referenced by the `test:property` script in `package.json`.
  */
-import fc from "fast-check";
-import { describe, expect, it } from "vitest";
-import { BACKENDS, createVerifier } from "../../index";
-import type { Contract, Verdict } from "../../index";
+import fc from 'fast-check';
+import { describe, expect, it } from 'vitest';
+import { BACKENDS, createVerifier } from '../../index';
+import type { Contract, Verdict } from '../../index';
 
 /** Generator: any well-formed {@link Contract} (non-empty strings, etc). */
 const contractArb: fc.Arbitrary<Contract> = fc.record({
@@ -22,21 +22,21 @@ const contractArb: fc.Arbitrary<Contract> = fc.record({
 
 /** A {@link Verdict} must satisfy the documented structural invariants. */
 function assertVerdictInvariants(v: Verdict): void {
-  expect(typeof v.ok).toBe("boolean");
+  expect(typeof v.ok).toBe('boolean');
   expect(Number.isFinite(v.durationMs)).toBe(true);
   expect(v.durationMs).toBeGreaterThanOrEqual(0);
   if (v.ok) {
     expect(v.proof).toBeDefined();
-    expect(typeof v.proof).toBe("string");
+    expect(typeof v.proof).toBe('string');
     expect(v.counterexample).toBeUndefined();
   } else {
     expect(v.counterexample).toBeDefined();
-    expect(typeof v.counterexample).toBe("string");
+    expect(typeof v.counterexample).toBe('string');
     expect(v.proof).toBeUndefined();
   }
 }
 
-describe("PhenoContracts ports — property-based", () => {
+describe('PhenoContracts ports — property-based', () => {
   // 100 iterations is the default for fast-check; bump to 200 for higher
   // confidence without slowing the suite materially.
   const NUM_RUNS = 200;
@@ -45,7 +45,7 @@ describe("PhenoContracts ports — property-based", () => {
     describe(`backend=${backend}`, () => {
       const v = createVerifier(backend);
 
-      it("verify always returns a Verdict honoring the invariants", async () => {
+      it('verify always returns a Verdict honoring the invariants', async () => {
         await fc.assert(
           fc.asyncProperty(contractArb, async (c) => {
             const verdict = await v.verify(c);
@@ -55,11 +55,11 @@ describe("PhenoContracts ports — property-based", () => {
             // Contract name is preserved.
             expect(verdict.proof).toContain(c.name);
           }),
-          { numRuns: NUM_RUNS },
+          { numRuns: NUM_RUNS }
         );
       });
 
-      it("discharge always returns a Verdict honoring the invariants", async () => {
+      it('discharge always returns a Verdict honoring the invariants', async () => {
         await fc.assert(
           fc.asyncProperty(contractArb, async (c) => {
             const verdict = await v.discharge(c);
@@ -67,39 +67,39 @@ describe("PhenoContracts ports — property-based", () => {
             expect(verdict.proof).toContain(`${backend}:`);
             expect(verdict.proof).toContain(c.name);
           }),
-          { numRuns: NUM_RUNS },
+          { numRuns: NUM_RUNS }
         );
       });
 
-      it("verify and discharge agree on the same Contract (idempotence)", async () => {
+      it('verify and discharge agree on the same Contract (idempotence)', async () => {
         await fc.assert(
           fc.asyncProperty(contractArb, async (c) => {
             const a = await v.verify(c);
             const b = await v.discharge(c);
             expect(b).toEqual(a);
           }),
-          { numRuns: NUM_RUNS },
+          { numRuns: NUM_RUNS }
         );
       });
 
-      it("backend field is stable across calls", () => {
+      it('backend field is stable across calls', () => {
         fc.assert(
           fc.property(fc.constant(null), () => {
             expect(v.backend).toBe(backend);
           }),
-          { numRuns: NUM_RUNS },
+          { numRuns: NUM_RUNS }
         );
       });
     });
   }
 
-  it("BACKENDS list has no duplicates and is non-empty", () => {
+  it('BACKENDS list has no duplicates and is non-empty', () => {
     fc.assert(
       fc.property(fc.constant(null), () => {
         expect(BACKENDS.length).toBeGreaterThan(0);
         expect(new Set(BACKENDS).size).toBe(BACKENDS.length);
       }),
-      { numRuns: 10 },
+      { numRuns: 10 }
     );
   });
 });

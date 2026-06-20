@@ -7,48 +7,48 @@
  *
  * Run: `bun run bench`
  */
-import { bench, describe } from "vitest";
-import { BACKENDS, createVerifier } from "../../index";
-import type { Contract } from "../../index";
+import { bench, describe } from 'vitest';
+import { BACKENDS, createVerifier } from '../../index';
+import type { Contract } from '../../index';
 
 const sample: Contract = {
-  name: "bench_no_overflow",
-  predicate: "x + 1 > x",
-  target: "fn add_one(x: u64) -> u64",
+  name: 'bench_no_overflow',
+  predicate: 'x + 1 > x',
+  target: 'fn add_one(x: u64) -> u64',
 };
 
-describe("PhenoContracts ports — benchmarks", () => {
+describe('PhenoContracts ports — benchmarks', () => {
   for (const backend of BACKENDS) {
     const v = createVerifier(backend);
 
     describe(`backend=${backend}`, () => {
       bench(
-        "verify",
+        'verify',
         async () => {
           await v.verify(sample);
         },
-        { time: 250 },
+        { time: 250 }
       );
 
       bench(
-        "discharge",
+        'discharge',
         async () => {
           await v.discharge(sample);
         },
-        { time: 250 },
+        { time: 250 }
       );
     });
   }
 
-  describe("registry", () => {
+  describe('registry', () => {
     bench(
-      "createVerifier x 3",
+      'createVerifier x 3',
       () => {
         for (const b of BACKENDS) {
           createVerifier(b);
         }
       },
-      { time: 250 },
+      { time: 250 }
     );
   });
 });
