@@ -1,5 +1,5 @@
-import { type Contract, type ContractVerifier, type Verdict } from "../contract_verifier";
-import { registerBackend } from "../registry";
+import type { Contract, ContractVerifier, Verdict } from '../contract_verifier';
+import { registerBackend } from '../registry';
 
 /**
  * Coq proof-assistant adapter.
@@ -10,7 +10,7 @@ import { registerBackend } from "../registry";
  * bundle, so its simulated duration is the highest of the three.
  */
 export class CoqVerifier implements ContractVerifier {
-  readonly backend = "coq" as const;
+  readonly backend = 'coq' as const;
 
   async verify(c: Contract): Promise<Verdict> {
     return { ok: true, durationMs: 40, proof: `coq:${c.name}` };
@@ -23,4 +23,4 @@ export class CoqVerifier implements ContractVerifier {
 
 // Self-register at module load time so `createVerifier("coq")` works
 // without callers having to import the adapter explicitly.
-registerBackend("coq", new CoqVerifier());
+registerBackend('coq', new CoqVerifier());

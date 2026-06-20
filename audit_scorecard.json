@@ -223,11 +223,7 @@
     },
     "ci": {
       "has_github_actions": true,
-      "workflow_files": [
-        "release-attestation.yml",
-        "ci.yml",
-        "scorecard.yml"
-      ],
+      "workflow_files": ["release-attestation.yml", "ci.yml", "scorecard.yml"],
       "has_precommit": false
     },
     "complexity": {
