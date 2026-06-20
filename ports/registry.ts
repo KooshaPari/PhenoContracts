@@ -3,7 +3,7 @@
 //! Each backend (Prusti, Kani, …) is registered here as an adapter that
 //! implements the ContractVerifier interface.
 
-import { type ContractVerifier, type Backend, type Verdict } from "./contract_verifier";
+import type { ContractVerifier, Backend } from './contract_verifier';
 
 /// Map of registered backends keyed by their canonical name.
 const backends = new Map<string, ContractVerifier>();
@@ -14,10 +14,12 @@ export function registerBackend(name: Backend, verifier: ContractVerifier): void
 }
 
 /// Create a ContractVerifier for the given backend, defaulting to "prusti".
-export function createVerifier(backend: Backend = "prusti"): ContractVerifier {
+export function createVerifier(backend: Backend = 'prusti'): ContractVerifier {
   const v = backends.get(backend);
   if (!v) {
-    throw new Error(`No ContractVerifier registered for backend "${backend}".\nAvailable: ${[...backends.keys()].join(", ")}`);
+    throw new Error(
+      `No ContractVerifier registered for backend "${backend}".\nAvailable: ${[...backends.keys()].join(', ')}`
+    );
   }
   return v;
 }
@@ -42,7 +44,7 @@ export function backendNames(): Backend[] {
  * `ports/tests/bench/contract_verifier.bench.ts:11`). For runtime registry
  * state, use {@link backendNames} instead.
  */
-export const BACKENDS = ["kani", "prusti", "coq"] as const satisfies readonly Backend[];
+export const BACKENDS = ['kani', 'prusti', 'coq'] as const satisfies readonly Backend[];
 
 /// Re-export the Backend type from the contract verifier for convenience.
-export type { Backend, Verdict, ContractVerifier } from "./contract_verifier";
+export type { Backend, Verdict, ContractVerifier } from './contract_verifier';

@@ -1,5 +1,5 @@
 /** T79: PhenoContracts hexagonal port — ContractVerifier. 3 adapters: Kani, Prusti, Coq. */
-export type Backend = "kani" | "prusti" | "coq";
+export type Backend = 'kani' | 'prusti' | 'coq';
 
 export interface Contract {
   readonly name: string;

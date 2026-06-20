@@ -32,13 +32,13 @@ jobs:
         run: bunx tsc --noEmit
 
       - name: Lint
-        run: bunx biome check . 2>&1 || true
+        run: bunx biome check .
 
-      - name: Test
-        run: bunx vitest run 2>&1 || true
+      - name: Test with coverage gate
+        run: bunx vitest run --coverage
 
       - name: Build
-        run: bun run build 2>&1 || true
+        run: bun run build
 
   secrets:
     name: TruffleHog secrets scan
