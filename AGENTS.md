@@ -38,6 +38,10 @@ PhenoContracts/
 │   ├── adapters/
 │   │   ├── kani.ts             # Kani model checker adapter
 │   │   └── prusti.ts           # Prusti deductive verifier adapter
+│   ├── logger.ts               # Structured logger (zero-dep JSON console wrapper)
+│   ├── health.ts               # Health/status snapshot model
+│   ├── diagnostics.ts          # Diagnostics runner across all adapters
+│   ├── diagnostics_cli.ts      # CLI entry point for diagnostics command
 │   └── tests/
 │       └── contract_verifier.test.ts  # Port contract tests
 ├── rust/

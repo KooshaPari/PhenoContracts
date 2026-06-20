@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "ports",
+    "declaration": true,
+    "sourceMap": true,
+    "types": ["node"]
+  },
+  "include": ["ports/**/*.ts"],
+  "exclude": ["node_modules", "dist", "ports/tests", "ports/diagnostics_cli.ts"]
+}

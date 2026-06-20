@@ -1,0 +1,21 @@
+{
+  "name": "phenocontracts",
+  "version": "0.1.0",
+  "description": "Hexagonal port contracts for formal verification adapters",
+  "type": "module",
+  "license": "(MIT OR Apache-2.0)",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json",
+    "diagnostics": "tsc && node --import tsx ports/diagnostics_cli.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  }
+}

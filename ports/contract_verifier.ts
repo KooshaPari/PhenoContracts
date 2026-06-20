@@ -1,4 +1,6 @@
-/** T79: PhenoContracts hexagonal port — ContractVerifier. 3 adapters: Kani, Prusti, Coq. */
+/** T79: PhenoContracts hexagonal port — ContractVerifier. Adapters: Kani, Prusti, Coq. */
+import type { HealthCheck, HealthSnapshot } from "./health";
+
 export interface Contract {
   readonly name: string;
   readonly predicate: string;
@@ -14,4 +16,6 @@ export interface ContractVerifier {
   readonly backend: "kani" | "prusti" | "coq";
   verify(c: Contract): Promise<Verdict>;
   discharge(c: Contract): Promise<Verdict>;
+  health(): HealthSnapshot;
 }
+export type { HealthCheck, HealthSnapshot } from "./health";

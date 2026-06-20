@@ -29,6 +29,14 @@ port contract compliance.
 - [x] Coq adapter: missing (only 2 of 3 adapters)
 - [x] Port contract tests (`ports/tests/contract_verifier.test.ts`)
 
+## Stage 2.5 — Observability (Issue #7)
+
+- [x] Structured logger (`ports/logger.ts`) — zero-dep JSON console wrapper
+- [x] Health/status metadata (`ports/health.ts`) — snapshots with per-check aggregation
+- [x] Diagnostics command (`ports/diagnostics.ts` + `ports/diagnostics_cli.ts`)
+- [x] Logger wired into adapters; `health()` added to `ContractVerifier` port
+- [x] Tests for logger, health, diagnostics (`ports/tests/*.test.ts`)
+
 ## Stage 3 — QA Hardening
 
 - [ ] Coverage gate (80% threshold)

@@ -20,4 +20,15 @@ describe("PhenoContracts ports", () => {
   it("ContractVerifier interface object-safe", () => {
     const _s: import("../contract_verifier").ContractVerifier = new KaniVerifier();
   });
+  it("KaniVerifier.health returns snapshot", () => {
+    const snap = new KaniVerifier().health();
+    expect(snap.status).toBe("ok");
+    expect(snap.version).toBeDefined();
+    expect(snap.checks.backend?.status).toBe("ok");
+  });
+  it("PrustiVerifier.health returns snapshot", () => {
+    const snap = new PrustiVerifier().health();
+    expect(snap.status).toBe("ok");
+    expect(snap.checks.backend?.status).toBe("ok");
+  });
 });
