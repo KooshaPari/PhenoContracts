@@ -1,0 +1,46 @@
+# Gitattributes — PhenoContracts
+# Normalize line endings to LF
+* text=auto eol=lf
+
+# TypeScript / JavaScript
+*.ts text
+*.tsx text
+*.js text
+*.jsx text
+*.mjs text
+*.cjs text
+*.json text
+
+# Rust
+*.rs text
+*.toml text
+*.lock text diff=rust
+
+# Web / config
+*.yml text
+*.yaml text
+*.html text
+*.css text
+*.md text diff=markdown
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# Diff-friendly binaries
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.woff binary
+*.woff2 binary
+
+# Lockfiles — treat as binary for diff purposes
+bun.lock binary
+Cargo.lock binary
+
+# Editor / OS junk
+.DS_Store binary
+*.swp binary
+*.swo binary
