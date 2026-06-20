@@ -22,7 +22,7 @@ jobs:
       CARGO_WORKDIR: PhenoContracts/rust/
     steps:
       - name: Checkout source
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           fetch-depth: 0
 
@@ -32,7 +32,7 @@ jobs:
           toolchain: stable
 
       - name: Cache cargo registry and build artifacts
-        uses: Swatinem/rust-cache@42dc69e1aa15d09112580998cf2ef0119e2e91ae
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
         with:
           workspaces: |
             PhenoContracts/rust/ -> target
@@ -73,7 +73,7 @@ jobs:
           ls -la release-artifacts/
 
       - name: Upload artifacts for provenance
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: release-artifacts
           path: ${{ env.CARGO_WORKDIR }}/release-artifacts/
@@ -81,6 +81,6 @@ jobs:
           retention-days: 90
 
       - name: Attest build provenance (SLSA Build L2)
-        uses: slsa-framework/slsa-github-generator/attest-build-provenance@c747fe7769adf3656dc7d588b161cb614d7abfee
+        uses: slsa-framework/slsa-github-generator/attest-build-provenance@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a
         with:
           artifact-name: release-artifacts
