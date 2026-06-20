@@ -15,7 +15,7 @@
     "quality": "tsc --noEmit && biome check . && vitest run --coverage"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.0",
+    "@biomejs/biome": "^2.5.0",
     "fast-check": "^4.0.0",
     "@types/node": "^26.0.0",
     "@vitest/coverage-v8": "2.1.9",
