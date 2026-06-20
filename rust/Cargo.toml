@@ -9,9 +9,13 @@ members = [
 [workspace.package]
 edition = "2021"
 version = "0.1.0"
+description = "Hexagonal port contracts for formal verification adapters in the Phenotype ecosystem"
 license = "MIT OR Apache-2.0"
 publish = false
 repository = "https://github.com/KooshaPari/PhenoContracts"
+documentation = "https://docs.rs/phenotype-contracts"
+keywords = ["phenotype", "pheno-contracts", "formal-verification", "kani", "prusti"]
+categories = ["development-tools", "rust-patterns"]
 authors = ["kooshapari"]
 
 [workspace.dependencies]
