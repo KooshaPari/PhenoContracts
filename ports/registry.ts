@@ -32,5 +32,8 @@ export function backendNames(): Backend[] {
   return [...backends.keys()] as Backend[];
 }
 
+/// Canonical list of registered backend names, used by bench tests and tooling.
+export const BACKENDS: Backend[] = backendNames();
+
 /// Re-export the Backend type from the contract verifier for convenience.
 export type { Backend, Verdict, ContractVerifier } from "./contract_verifier";
