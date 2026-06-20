@@ -1,4 +1,5 @@
-import type { Contract, ContractVerifier, Verdict } from "../contract_verifier";
+import { type Contract, type ContractVerifier, type Verdict } from "../contract_verifier";
+import { registerBackend } from "../registry";
 
 /**
  * Coq proof-assistant adapter.
@@ -19,3 +20,7 @@ export class CoqVerifier implements ContractVerifier {
     return this.verify(c);
   }
 }
+
+// Self-register at module load time so `createVerifier("coq")` works
+// without callers having to import the adapter explicitly.
+registerBackend("coq", new CoqVerifier());
