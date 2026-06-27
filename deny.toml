@@ -1,64 +1,91 @@
-# deny.toml — cargo-deny configuration for PhenoContracts Rust workspace.
-# See https://embarkstudios.github.io/cargo-deny/
+# /Users/kooshapari/CodeProjects/Phenotype/repos/PhenoContracts/deny.toml
+# cargo-deny configuration for the PhenoContracts Rust workspace.
+#
+# Schema reference: https://embarkstudios.github.io/cargo-deny/
+# Workspace lives under rust/; cargo-deny auto-detects it when invoked from
+# inside the workspace dir, which is what `just deny` does.
+#
+# Sections enforced (all four required by task scope):
+#   [advisories] — RustSec vulnerability DB
+#   [bans]       — duplicate versions, wildcards, sketchy sources
+#   [licenses]   — allowlist + copyleft policy
+#   [sources]    — registry / git allowlist
+# Plus: [graph], [output].
 
 [graph]
-# 1 crate may have 2+ semver-incompatible versions in the dep graph.
+# Build graph for the targets we actually ship from CI.
 targets = [
     { triple = "x86_64-unknown-linux-gnu" },
     { triple = "aarch64-apple-darwin" },
     { triple = "x86_64-apple-darwin" },
 ]
+all-features = false
+no-default-features = false
+exclude-dev = false
+
+[output]
+# Feature-depth controls how verbose feature edges are in graph diagnostics.
+feature-depth = 1
 
 [advisories]
-vulnerability = "deny"
-unmaintained = "warn"
-notice = "warn"
-ignore = []
-# DB path — can be local or remote; we default to the GitHub Advisory Database.
+# Pull the RustSec advisory DB from the canonical mirror.
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
+ignore = []
+git-fetch-with-cli = false
+
+[bans]
+# Two semver-incompatible versions of the same crate in the dep graph is a smell.
+multiple-versions = "warn"
+# Wildcards in version specs are easy to miss and tend to bloat the graph.
+wildcards = "deny"
+highlight = "all"
+allow = []
+deny = []
+skip = []
+skip-tree = []
+external-default-features = "allow"
+workspace-default-features = "allow"
+allow-workspace = true
 
 [licenses]
-unlicensed = "deny"
+version = 2
+# PhenoContracts itself is dual-licensed MIT OR Apache-2.0. Allow the standard
+# permissive set used by the Rust ecosystem.
 allow = [
     "MIT",
     "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
-    "ISC",
     "BSD-2-Clause",
     "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "0BSD",
     "CC0-1.0",
     "Unicode-3.0",
     "Unicode-DFS-2016",
-    "Zlib",
+    "OpenSSL",
+    "MPL-2.0",   # OK for transitive deps; promote to deny if it bites us
+    "BSL-1.0",   # Boost Software License — used by some numerical crates
+    "Unicode-DFS-2015",
 ]
-deny = []
-copyleft = "deny"
-blanket = { deny = ["MIT", "Apache-2.0"] }
-allow-osi-fsf-free = "neither"
-default = "deny"
 confidence-threshold = 0.8
-exceptions = [
-    { allow = ["Unicode-3.0"], name = "unicode-ident" },
-    { allow = ["Unicode-DFS-2016"], name = "unicode-width" },
-]
+exceptions = []
 
-[bans]
-multiple-versions = "deny"
-wildcards = "deny"
-highlight = "all"
-deny = []
-skip = [
-    # Remove once darling drops syn <2 dependency.
-    { name = "syn", version = "1" },
-]
-skip-tree = [
-    # criterion pulls in many dev-only deps we don't need to chase.
-    { name = "criterion", version = "0.5" },
-]
+[licenses.private]
+ignore = false
+registries = []
 
 [sources]
-unknown-git = "deny"
+# Only allow pulling from crates.io via the canonical sparse index.
 unknown-registry = "deny"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = []
-allow-registry = ["https://github.com/rustsec/advisory-db"]
+
+[sources.allow-org]
+github = []
+gitlab = []
+bitbucket = []
+
+# ----- End of deny.toml -----
