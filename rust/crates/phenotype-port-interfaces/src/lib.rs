@@ -60,7 +60,11 @@ pub struct VerifyResponse {
 }
 
 /// Errors surfaced by backend adapters.
-#[derive(Debug, Error)]
+///
+/// Serialize + Deserialize are required so that error types can cross
+/// FFI boundaries (e.g. Tauri invoke, WebAssembly bindings, or any
+/// JSON-serialized protocol between Rust and TypeScript).
+#[derive(Debug, Error, Serialize, Deserialize)]
 pub enum PortError {
     /// The backend could not be initialized (toolchain missing, etc).
     #[error("backend init failed: {0}")]
@@ -109,5 +113,38 @@ mod tests {
         let j = serde_json::to_string(&r).unwrap();
         let back: VerifyRequest = serde_json::from_str(&j).unwrap();
         assert_eq!(r, back);
+    }
+
+    #[test]
+    fn port_error_is_serde_roundtrippable() {
+        let cases: Vec<PortError> = vec![
+            PortError::Init("toolchain not found".to_string()),
+            PortError::InvalidContract("malformed predicate".to_string()),
+            PortError::Timeout(5000),
+            PortError::Internal("unexpected signal".to_string()),
+        ];
+        for err in cases {
+            let j = serde_json::to_string(&err).unwrap();
+            let back: PortError = serde_json::from_str(&j).unwrap();
+            assert_eq!(format!("{}", err), format!("{}", back));
+        }
+    }
+
+    #[test]
+    fn port_error_json_structure_is_self_describing() {
+        // Each variant serializes as JSON with the variant tag so that
+        // consumers on the other side of an FFI boundary can inspect
+        // the error type without matching on Rust enums.
+        let err = PortError::Timeout(3000);
+        let j = serde_json::to_value(&err).unwrap();
+        let obj = j.as_object().expect("PortError must serialize as an object");
+        // serde adjacently-tagged: { "Timeout": 3000 } or { "Timeout": "3000ms" }
+        // With thiserror + serde, the default is externally-tagged:
+        // { "Timeout": "backend timeout after 3000ms" }
+        assert!(
+            obj.contains_key("Timeout"),
+            "expected 'Timeout' key in serialized PortError, got keys: {:?}",
+            obj.keys()
+        );
     }
 }

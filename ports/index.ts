@@ -15,7 +15,8 @@ import './adapters/kani';
 import './adapters/prusti';
 
 export type { Backend, Contract, Verdict, ContractVerifier } from './contract_verifier';
-export { BACKENDS, createVerifier, isBackend, backendNames, registerBackend } from './registry';
+export { BACKENDS, createVerifier, isBackend, backendNames, registerBackend, RegistryError } from './registry';
 export { CoqVerifier } from './adapters/coq';
 export { KaniVerifier } from './adapters/kani';
 export { PrustiVerifier } from './adapters/prusti';
+export { ContractError, validateContract } from './validation';

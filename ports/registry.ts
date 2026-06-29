@@ -5,6 +5,36 @@
 
 import type { ContractVerifier, Backend } from './contract_verifier';
 
+// ---------------------------------------------------------------------------
+// RegistryError — typed error for registry lookups (ADR-L14)
+// ---------------------------------------------------------------------------
+
+/**
+ * Typed error thrown by the backend registry when a verifier is requested
+ * for an unregistered backend name.
+ *
+ * Carries a machine-readable {@link code} and the list of backends that
+ * *are* registered, so callers can recover programmatically.
+ */
+export class RegistryError extends Error {
+  /**
+   * Machine-readable error code, stable across versions.
+   * - `"UNREGISTERED_BACKEND"` — the backend has no registered adapter.
+   * - `"INVALID_BACKEND"` — the name is not a valid {@link Backend} value.
+   */
+  readonly code: string;
+
+  /** Backend names currently registered in the runtime registry. */
+  readonly availableBackends: string[];
+
+  constructor(message: string, code: string, availableBackends: string[]) {
+    super(message);
+    this.name = 'RegistryError';
+    this.code = code;
+    this.availableBackends = availableBackends;
+  }
+}
+
 /// Map of registered backends keyed by their canonical name.
 const backends = new Map<string, ContractVerifier>();
 
@@ -17,8 +47,10 @@ export function registerBackend(name: Backend, verifier: ContractVerifier): void
 export function createVerifier(backend: Backend = 'prusti'): ContractVerifier {
   const v = backends.get(backend);
   if (!v) {
-    throw new Error(
-      `No ContractVerifier registered for backend "${backend}".\nAvailable: ${[...backends.keys()].join(', ')}`
+    throw new RegistryError(
+      `No ContractVerifier registered for backend "${backend}".\nAvailable: ${backends.size > 0 ? [...backends.keys()].join(', ') : '(none — no adapters loaded yet)'}`,
+      'UNREGISTERED_BACKEND',
+      [...backends.keys()]
     );
   }
   return v;
