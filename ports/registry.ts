@@ -5,6 +5,19 @@
 
 import type { ContractVerifier, Backend } from './contract_verifier';
 
+/// Error thrown when `createVerifier` is called with an unregistered backend.
+export class BackendNotFoundError extends Error {
+  readonly backend: string;
+  readonly available: readonly string[];
+
+  constructor(backend: string, available: readonly string[]) {
+    super(`No ContractVerifier registered for backend "${backend}".\nAvailable: ${available.join(', ')}`);
+    this.name = 'BackendNotFoundError';
+    this.backend = backend;
+    this.available = available;
+  }
+}
+
 /// Map of registered backends keyed by their canonical name.
 const backends = new Map<string, ContractVerifier>();
 
@@ -14,12 +27,12 @@ export function registerBackend(name: Backend, verifier: ContractVerifier): void
 }
 
 /// Create a ContractVerifier for the given backend, defaulting to "prusti".
+///
+/// @throws {BackendNotFoundError} if the requested backend has not been registered.
 export function createVerifier(backend: Backend = 'prusti'): ContractVerifier {
   const v = backends.get(backend);
   if (!v) {
-    throw new Error(
-      `No ContractVerifier registered for backend "${backend}".\nAvailable: ${[...backends.keys()].join(', ')}`
-    );
+    throw new BackendNotFoundError(backend, [...backends.keys()]);
   }
   return v;
 }

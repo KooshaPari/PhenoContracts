@@ -83,10 +83,7 @@ pub trait Port: Send + Sync {
     fn backend(&self) -> Backend;
 
     /// Verify a contract on behalf of the port.
-    async fn verify(
-        &self,
-        request: VerifyRequest,
-    ) -> Result<VerifyResponse, PortError>;
+    async fn verify(&self, request: VerifyRequest) -> Result<VerifyResponse, PortError>;
 }
 
 #[cfg(test)]
