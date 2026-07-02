@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { KaniVerifier } from '../adapters/kani';
 import { PrustiVerifier } from '../adapters/prusti';
+import { createVerifier, BackendNotFoundError } from '../registry';
 
 describe('PhenoContracts ports', () => {
   it('KaniVerifier.backend', () => {
@@ -19,5 +20,19 @@ describe('PhenoContracts ports', () => {
   });
   it('ContractVerifier interface object-safe', () => {
     const _s: import('../contract_verifier').ContractVerifier = new KaniVerifier();
+  });
+  it('createVerifier throws BackendNotFoundError for unknown backend', () => {
+    expect(() => createVerifier('coq' as never)).toThrow(BackendNotFoundError);
+  });
+  it('BackendNotFoundError has expected name and properties', () => {
+    try {
+      createVerifier('coq' as never);
+    } catch (e) {
+      expect(e).toBeInstanceOf(BackendNotFoundError);
+      const err = e as BackendNotFoundError;
+      expect(err.name).toBe('BackendNotFoundError');
+      expect(err.backend).toBe('coq');
+      expect(err.available).toEqual(['kani', 'prusti']);
+    }
   });
 });
