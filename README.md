@@ -2,6 +2,8 @@
 
 PhenoContracts: shared Phenotype API contracts for formal verification.
 
+[![AI slop inside](https://sladge.net/badge.svg)](https://sladge.net) [![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/KooshaPari/PhenoContracts/total)](https://github.com/KooshaPari/PhenoContracts/releases)
+
 A hexagonal contract-verification port with multi-backend support (Prusti,
 Kani, Coq) and a polyglot workspace combining TypeScript (port interface,
 registry, tests) with Rust (core contract models, port interfaces, traits).
