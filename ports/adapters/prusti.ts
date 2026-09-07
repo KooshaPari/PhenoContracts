@@ -1,10 +1,17 @@
 import type { Contract, ContractVerifier, Verdict } from '../contract_verifier';
 import { registerBackend } from '../registry';
+import { type AdapterOptions, runAdapter, toVerdict } from './kani';
 
 export class PrustiVerifier implements ContractVerifier {
   readonly backend = 'prusti' as const;
+  private readonly options: AdapterOptions;
+
+  constructor(options: AdapterOptions = {}) {
+    this.options = options;
+  }
+
   async verify(c: Contract): Promise<Verdict> {
-    return { ok: true, durationMs: 20, proof: `prusti:${c.name}` };
+    return toVerdict(await runAdapter(this.backend, c, this.options));
   }
   async discharge(c: Contract): Promise<Verdict> {
     return this.verify(c);
