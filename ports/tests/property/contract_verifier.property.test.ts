@@ -66,11 +66,12 @@ describe('PhenoContracts ports — property-based', () => {
       const v = configuredVerifier(backend, {
         command: ['fake'],
         runner: {
-          async run() {
+          async run(_argv, opts) {
+            const request = JSON.parse(opts.stdin) as { requestId: string; contractHash: string };
             return {
               exitCode: 0,
               signal: null,
-              stdout: Buffer.from(JSON.stringify({ ok: true, backend, version: 'property-1', proof: 'proof' })),
+              stdout: Buffer.from(JSON.stringify({ ok: true, backend, version: 'property-1', proof: 'proof', requestId: request.requestId, contractHash: request.contractHash })),
               stderr: Buffer.alloc(0),
               timedOut: false,
               durationMs: 1,
