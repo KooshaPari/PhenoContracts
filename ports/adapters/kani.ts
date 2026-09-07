@@ -206,6 +206,9 @@ export const defaultSpawnRunner: SpawnRunner = {
       child.stderr?.on('data', onChunk('stderr'));
 
       // Deliver contract payload via stdin, then close so the child can drain.
+      // A backend may exit before consuming stdin; retain a listener so its
+      // asynchronous EPIPE is not emitted as an uncaught stream error.
+      child.stdin?.once('error', () => {});
       try {
         child.stdin?.write(opts.stdin);
         child.stdin?.end();

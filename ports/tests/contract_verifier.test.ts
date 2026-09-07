@@ -37,9 +37,6 @@ describe('PhenoContracts ports', () => {
   it('PrustiVerifier.backend', () => {
     expect(new PrustiVerifier().backend).toBe('prusti');
   });
-  it('CoqVerifier.backend', () => {
-    expect(new CoqVerifier().backend).toBe('coq');
-  });
   it('KaniVerifier.verify ok=false when no command configured', async () => {
     const v = await new KaniVerifier().verify(sample);
     expect(v.ok).toBe(false);

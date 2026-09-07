@@ -29,6 +29,11 @@ import type { Contract } from '../contract_verifier';
 
 const sample: Contract = { name: 'add_one', predicate: 'x + 1 > x', target: 'fn add_one(x: u64) -> u64' };
 
+function correlatedEvidence(payload: string, evidence: Record<string, unknown>): string {
+  const request = JSON.parse(payload) as { requestId: string; contractHash: string };
+  return JSON.stringify({ ...evidence, requestId: request.requestId, contractHash: request.contractHash });
+}
+
 /** A deterministic in-memory runner for unit tests. */
 function makeFakeRunner(
   behavior: (argv: readonly string[], payload: string) => Partial<SpawnResult> & { exitCode: number | null }
@@ -39,17 +44,7 @@ function makeFakeRunner(
       opts: { stdin: string; timeoutMs: number; maxOutputBytes: number }
     ): Promise<SpawnResult> {
       const out = behavior(argv, opts.stdin);
-      let stdoutText = out.stdout ?? '';
-      try {
-        const evidence = JSON.parse(stdoutText) as Record<string, unknown>;
-        const request = JSON.parse(opts.stdin) as Record<string, unknown>;
-        if (evidence && typeof evidence === 'object' && typeof evidence.ok === 'boolean' && typeof evidence.backend === 'string') {
-          evidence.requestId ??= request.requestId;
-          evidence.contractHash ??= request.contractHash;
-          stdoutText = JSON.stringify(evidence);
-        }
-      } catch { /* preserve malformed fixture output */ }
-      const stdout = Buffer.from(stdoutText);
+      const stdout = Buffer.from(out.stdout ?? '');
       const stderr = Buffer.from(out.stderr ?? '');
       return {
         exitCode: out.exitCode,
@@ -109,9 +104,9 @@ describe('PhenoContracts adapters — fail-closed', () => {
     });
 
     it('ok=true only when exit=0 and non-empty stdout evidence', async () => {
-      const runner = makeFakeRunner(() => ({
+      const runner = makeFakeRunner((_argv, payload) => ({
         exitCode: 0,
-        stdout: JSON.stringify({ ok: true, backend: 'kani', version: 'test-1', proof: 'verified' }),
+        stdout: correlatedEvidence(payload, { ok: true, backend: 'kani', version: 'test-1', proof: 'verified' }),
       }));
       const v = new KaniVerifier({ command: ['kani'], runner });
       const verdict = await v.verify(sample);
@@ -141,10 +136,29 @@ describe('PhenoContracts adapters — fail-closed', () => {
       expect(verdict.counterexample).toMatch(/malformed/i);
     });
 
+    it('fails closed when correlation fields are absent or mismatched', async () => {
+      for (const evidence of [
+        { ok: true, backend: 'kani', version: 'test-1', proof: 'verified' },
+        {
+          ok: true,
+          backend: 'kani',
+          version: 'test-1',
+          proof: 'verified',
+          requestId: 'stale-request',
+          contractHash: 'stale-hash',
+        },
+      ]) {
+        const runner = makeFakeRunner(() => ({ exitCode: 0, stdout: JSON.stringify(evidence) }));
+        const verdict = await new KaniVerifier({ command: ['kani'], runner }).verify(sample);
+        expect(verdict.ok).toBe(false);
+        expect(verdict.counterexample).toMatch(/malformed|correlation mismatch/i);
+      }
+    });
+
     it('preserves a backend-declared negative result', async () => {
-      const runner = makeFakeRunner(() => ({
+      const runner = makeFakeRunner((_argv, payload) => ({
         exitCode: 0,
-        stdout: JSON.stringify({
+        stdout: correlatedEvidence(payload, {
           ok: false,
           backend: 'kani',
           version: 'test-1',
@@ -157,9 +171,9 @@ describe('PhenoContracts adapters — fail-closed', () => {
     });
 
     it('discharge behaves identically to verify on the same contract', async () => {
-      const runner = makeFakeRunner(() => ({
+      const runner = makeFakeRunner((_argv, payload) => ({
         exitCode: 0,
-        stdout: JSON.stringify({ ok: true, backend: 'kani', version: 'test-1', proof: 'verified' }),
+        stdout: correlatedEvidence(payload, { ok: true, backend: 'kani', version: 'test-1', proof: 'verified' }),
       }));
       const v = new KaniVerifier({ command: ['kani'], runner });
       const a = await v.verify(sample);
@@ -214,9 +228,9 @@ describe('PhenoContracts adapters — fail-closed', () => {
     });
 
     it('ok=true on real exit=0 evidence', async () => {
-      const runner = makeFakeRunner(() => ({
+      const runner = makeFakeRunner((_argv, payload) => ({
         exitCode: 0,
-        stdout: JSON.stringify({ ok: true, backend: 'prusti', version: 'test-1', proof: 'verified' }),
+        stdout: correlatedEvidence(payload, { ok: true, backend: 'prusti', version: 'test-1', proof: 'verified' }),
       }));
       const v = new PrustiVerifier({ command: ['prusti'], runner });
       const verdict = await v.verify(sample);
@@ -226,6 +240,10 @@ describe('PhenoContracts adapters — fail-closed', () => {
   });
 
   describe('Coq', () => {
+    it('identifies itself as the coq backend', () => {
+      expect(new CoqVerifier().backend).toBe('coq');
+    });
+
     it('ok=false and no proof when no command is configured', async () => {
       const v = new CoqVerifier();
       const verdict = await v.verify(sample);
@@ -252,9 +270,9 @@ describe('PhenoContracts adapters — fail-closed', () => {
     });
 
     it('ok=true only on exit=0 with non-empty evidence', async () => {
-      const runner = makeFakeRunner(() => ({
+      const runner = makeFakeRunner((_argv, payload) => ({
         exitCode: 0,
-        stdout: JSON.stringify({ ok: true, backend: 'coq', version: 'test-1', proof: 'QED' }),
+        stdout: correlatedEvidence(payload, { ok: true, backend: 'coq', version: 'test-1', proof: 'QED' }),
       }));
       const v = new CoqVerifier({ command: ['coqc'], runner });
       const verdict = await v.verify(sample);
@@ -337,15 +355,10 @@ exit 2
     });
 
     it('argv injection from a malicious-looking contract is not shell-interpreted', async () => {
-      // If shell:true had been used, "$(touch ...)" would execute. With shell:false it's just a literal arg.
+      // If shell:true had been used, this command argument would execute. With shell:false it remains literal.
       const injectionMarker = join(tmp, 'should-not-exist');
-      const malicious: Contract = {
-        name: `$(touch ${injectionMarker})`,
-        predicate: 'true',
-        target: 'fn',
-      };
-      const v = new KaniVerifier({ command: [fakePath, 'ok'] });
-      const verdict = await v.verify(malicious);
+      const v = new KaniVerifier({ command: [fakePath, 'ok', `$(touch ${injectionMarker})`] });
+      const verdict = await v.verify(sample);
       expect(verdict.ok).toBe(true);
       expect(existsSync(injectionMarker)).toBe(false);
     });
