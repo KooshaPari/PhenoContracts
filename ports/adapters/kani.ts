@@ -1,7 +1,6 @@
 import type { Contract, ContractVerifier, Verdict } from '../contract_verifier';
 import { registerBackend } from '../registry';
 import { type AdapterOptions, runAdapter, toVerdict } from './runner';
-export * from './runner';
 
 // ---------------------------------------------------------------------------
 // KaniVerifier

@@ -21,11 +21,11 @@ import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CoqVerifier } from '../adapters/coq';
-import { KaniVerifier } from '../adapters/kani';
-import type { SpawnResult } from '../adapters/kani';
-import { PrustiVerifier } from '../adapters/prusti';
-import type { Contract } from '../contract_verifier';
+import { CoqVerifier } from '../coq';
+import { KaniVerifier } from '../kani';
+import type { SpawnResult } from '../runner';
+import { PrustiVerifier } from '../prusti';
+import type { Contract } from '../../contract_verifier';
 
 const sample: Contract = { name: 'add_one', predicate: 'x + 1 > x', target: 'fn add_one(x: u64) -> u64' };
 

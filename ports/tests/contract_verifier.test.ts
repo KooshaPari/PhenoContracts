@@ -4,40 +4,9 @@ import { KaniVerifier } from '../adapters/kani';
 import { PrustiVerifier } from '../adapters/prusti';
 import { createVerifier, BackendNotFoundError } from '../registry';
 import type { ContractVerifier } from '../contract_verifier';
-import type { SpawnResult } from '../adapters/kani';
+import { okRunner } from './fixtures';
 
 const sample = { name: 'n', predicate: 'true', target: 'fn' } as const;
-
-/** In-memory runner that always returns exit 0 with a tagged proof. */
-function okRunner(backend: string): {
-  run: (
-    argv: readonly string[],
-    opts: { stdin: string; timeoutMs: number; maxOutputBytes: number }
-  ) => Promise<SpawnResult>;
-} {
-  return {
-    async run(_argv, opts) {
-      const request = JSON.parse(opts.stdin) as { requestId: string; contractHash: string };
-      return {
-        exitCode: 0,
-        signal: null,
-        stdout: Buffer.from(
-          JSON.stringify({
-            ok: true,
-            backend,
-            version: 'test-1',
-            proof: 'proof',
-            requestId: request.requestId,
-            contractHash: request.contractHash,
-          })
-        ),
-        stderr: Buffer.alloc(0),
-        timedOut: false,
-        durationMs: 1,
-      };
-    },
-  };
-}
 
 describe('PhenoContracts ports', () => {
   it('KaniVerifier.backend', () => {

@@ -1,3 +1,4 @@
+import { okRunner } from '../fixtures';
 /**
  * Property-based tests for the {@link ContractVerifier} port.
  *
@@ -13,7 +14,7 @@ import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import { BACKENDS, CoqVerifier, KaniVerifier, PrustiVerifier } from '../../index';
 import type { Backend, Contract, ContractVerifier, Verdict } from '../../index';
-import type { AdapterOptions } from '../../adapters/kani';
+import type { AdapterOptions } from '../../adapters/runner';
 
 /** Generator: any well-formed {@link Contract} (non-empty strings, etc). */
 const contractArb: fc.Arbitrary<Contract> = fc.record({
@@ -65,28 +66,7 @@ describe('PhenoContracts ports — property-based', () => {
       // so we exercise the success path under arbitrary contract inputs.
       const v = configuredVerifier(backend, {
         command: ['fake'],
-        runner: {
-          async run(_argv, opts) {
-            const request = JSON.parse(opts.stdin) as { requestId: string; contractHash: string };
-            return {
-              exitCode: 0,
-              signal: null,
-              stdout: Buffer.from(
-                JSON.stringify({
-                  ok: true,
-                  backend,
-                  version: 'property-1',
-                  proof: 'proof',
-                  requestId: request.requestId,
-                  contractHash: request.contractHash,
-                })
-              ),
-              stderr: Buffer.alloc(0),
-              timedOut: false,
-              durationMs: 1,
-            };
-          },
-        },
+        runner: okRunner(backend, 'property-1'),
       });
 
       it('verify always returns a Verdict honoring the invariants', async () => {

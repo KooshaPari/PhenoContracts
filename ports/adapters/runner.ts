@@ -188,6 +188,12 @@ export const defaultSpawnRunner: SpawnRunner = {
 
       child.stdout?.on('data', onChunk('stdout'));
       child.stderr?.on('data', onChunk('stderr'));
+      const onStreamError = (error: Error) => {
+        child.emit('error', error);
+        killChild();
+      };
+      child.stdout?.on('error', onStreamError);
+      child.stderr?.on('error', onStreamError);
 
       // Deliver contract payload via stdin, then close so the child can drain.
       // A backend may exit before consuming stdin; retain a listener so its
