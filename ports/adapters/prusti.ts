@@ -1,6 +1,6 @@
 import type { Contract, ContractVerifier, Verdict } from '../contract_verifier';
 import { registerBackend } from '../registry';
-import { type AdapterOptions, runAdapter, toVerdict } from './kani';
+import { type AdapterOptions, runAdapter, toVerdict } from './runner';
 
 export class PrustiVerifier implements ContractVerifier {
   readonly backend = 'prusti' as const;

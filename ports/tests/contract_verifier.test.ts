@@ -21,7 +21,16 @@ function okRunner(backend: string): {
       return {
         exitCode: 0,
         signal: null,
-        stdout: Buffer.from(JSON.stringify({ ok: true, backend, version: 'test-1', proof: 'proof', requestId: request.requestId, contractHash: request.contractHash })),
+        stdout: Buffer.from(
+          JSON.stringify({
+            ok: true,
+            backend,
+            version: 'test-1',
+            proof: 'proof',
+            requestId: request.requestId,
+            contractHash: request.contractHash,
+          })
+        ),
         stderr: Buffer.alloc(0),
         timedOut: false,
         durationMs: 1,

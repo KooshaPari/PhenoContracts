@@ -2,7 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/KooshaPari/forgecode/docs/contracts/provider-models/provider-model.schema.json",
   "title": "ProviderModelContract",
-  "description": "Language-agnostic contract for the provider/model registry shared across forgecode (Rust), OmniRoute (TypeScript), and cliproxy (Go). Version: 1.0.0. Each repo implements this contract in its native language; forgecode's forge_domain crate is the reference implementation.",
   "version": "1.0.0",
   "$defs": {
     "ModelId": {

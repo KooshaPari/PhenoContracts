@@ -379,3 +379,32 @@ exit 2
     });
   });
 });
+
+describe('injected runner contract', () => {
+  for (const Adapter of [KaniVerifier, PrustiVerifier, CoqVerifier]) {
+    it(`${Adapter.name} contains runner rejection`, async () => {
+      const adapter = new Adapter({
+        runner: {
+          run: async () => {
+            throw new Error('runner failure');
+          },
+        },
+      });
+      await expect(adapter.verify(sample)).resolves.toMatchObject({
+        ok: false,
+        counterexample: expect.stringContaining('runner failure'),
+      });
+    });
+    it(`${Adapter.name} invokes runner without dummy command`, async () => {
+      const adapter = new Adapter({
+        runner: makeFakeRunner((_argv, payload) => ({
+          exitCode: 0,
+          stdout: Buffer.from(
+            correlatedEvidence(payload, { backend: new Adapter().backend, version: '1', ok: true, proof: 'proof' })
+          ),
+        })),
+      });
+      await expect(adapter.verify(sample)).resolves.toMatchObject({ ok: true });
+    });
+  }
+});
