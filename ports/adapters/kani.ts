@@ -7,16 +7,11 @@ import { type AdapterOptions, runAdapter, toVerdict } from './runner';
 // ---------------------------------------------------------------------------
 
 /**
- * Kani (model checker for Rust) adapter.
- *
- * The constructor accepts {@link AdapterOptions}. When `command` is omitted
- * the adapter is unconfigured and `verify` / `discharge` return
- * `{ ok: false, counterexample: 'backend not configured', durationMs: 0 }`.
- *
- * On a configured invocation the adapter spawns the backend with
- * `shell: false`, passes the contract payload on stdin, and:
- *   - on `exit 0` with non-empty stdout: returns `{ ok: true, proof, durationMs }`;
- *   - on any other outcome: returns `{ ok: false, counterexample, durationMs }`.
+ * Kani protocol adapter. A configured executable must implement the correlated
+ * JSON protocol documented in README.md; ordinary prover stdout is insufficient.
+ * With neither command nor injected runner, verification fails closed.
+ * Success requires exit 0, matching request/backend identity and nonempty proof
+ * evidence. Transport failures and malformed evidence return an ok:false verdict.
  */
 export class KaniVerifier implements ContractVerifier {
   readonly backend = 'kani' as const;
@@ -38,6 +33,6 @@ export class KaniVerifier implements ContractVerifier {
 }
 
 // Self-register an unconfigured default instance so `createVerifier("kani")`
-// works without callers importing the adapter explicitly. Callers that want
+// works after this adapter module is imported. Callers that want
 // real verification construct `new KaniVerifier({ command: [...] })`.
 registerBackend('kani', new KaniVerifier());

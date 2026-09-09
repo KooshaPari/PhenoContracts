@@ -19,6 +19,6 @@ export class PrustiVerifier implements ContractVerifier {
 }
 
 // Self-register at module load time so `createVerifier("prusti")` works
-// without callers having to import the adapter explicitly. See ADR-014 /
+// after this adapter module has been imported. See ADR-014 /
 // `ports/registry.ts:registerBackend` for the pattern rationale.
 registerBackend('prusti', new PrustiVerifier());

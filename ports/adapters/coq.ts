@@ -26,5 +26,5 @@ export class CoqVerifier implements ContractVerifier {
 }
 
 // Self-register at module load time so `createVerifier("coq")` works
-// without callers having to import the adapter explicitly.
+// after this adapter module has been imported.
 registerBackend('coq', new CoqVerifier());

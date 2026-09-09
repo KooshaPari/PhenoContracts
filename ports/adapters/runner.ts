@@ -4,7 +4,7 @@ import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import type { Contract, Verdict } from '../contract_verifier';
 
 // ---------------------------------------------------------------------------
-// Shared types & spawn runner (re-exported by the other adapter modules).
+// Shared types & spawn runner (import directly from this module).
 // ---------------------------------------------------------------------------
 
 /** Default per-invocation timeout: 30 seconds. */
@@ -21,7 +21,7 @@ export interface AdapterOptions {
   /**
    * Shell argv to invoke. Must be a non-empty array. Each element is passed
    * verbatim to `spawn`; nothing is concatenated into a shell string.
-   * If omitted, the adapter is unconfigured and will fail-closed.
+   * If omitted without an injected runner, the adapter will fail closed.
    */
   readonly command?: readonly string[];
   /** Optional working directory for the child process. */
