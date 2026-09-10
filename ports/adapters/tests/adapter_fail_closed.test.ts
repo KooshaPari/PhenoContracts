@@ -74,7 +74,12 @@ describe('PhenoContracts adapters — fail-closed', () => {
 
     it('ok=false and no proof when configured command is missing (ENOENT)', async () => {
       // Inject a runner that mimics spawn ENOENT: exitCode=null, signal=null, no output.
-      const runner = makeFakeRunner(() => ({ exitCode: null, signal: null, stderr: 'spawn ENOENT' }));
+      const runner = makeFakeRunner(() => ({
+        exitCode: null,
+        signal: null,
+        spawnError: true,
+        spawnErrorMessage: 'spawn ENOENT',
+      }));
       const v = new KaniVerifier({ command: ['definitely-not-a-real-binary-xyz'], runner });
       const verdict = await v.verify(sample);
       expect(verdict.ok).toBe(false);
@@ -201,7 +206,11 @@ describe('PhenoContracts adapters — fail-closed', () => {
     });
 
     it('ok=false on missing tool (ENOENT)', async () => {
-      const runner = makeFakeRunner(() => ({ exitCode: null, stderr: 'spawn ENOENT' }));
+      const runner = makeFakeRunner(() => ({
+        exitCode: null,
+        spawnError: true,
+        spawnErrorMessage: 'spawn ENOENT',
+      }));
       const v = new PrustiVerifier({ command: ['nope'], runner });
       const verdict = await v.verify(sample);
       expect(verdict.ok).toBe(false);
@@ -253,7 +262,11 @@ describe('PhenoContracts adapters — fail-closed', () => {
     });
 
     it('ok=false on missing tool', async () => {
-      const runner = makeFakeRunner(() => ({ exitCode: null, stderr: 'spawn ENOENT' }));
+      const runner = makeFakeRunner(() => ({
+        exitCode: null,
+        spawnError: true,
+        spawnErrorMessage: 'spawn ENOENT',
+      }));
       const v = new CoqVerifier({ command: ['coq'], runner });
       const verdict = await v.verify(sample);
       expect(verdict.ok).toBe(false);
