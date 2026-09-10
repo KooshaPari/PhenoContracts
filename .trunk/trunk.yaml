@@ -8,5 +8,5 @@ plugins:
       uri: https://github.com/trunk-io/plugins
 lint:
   enabled:
-    - actionlint@1.7.7
+    - actionlint@1.6.9
 # TypeScript and JSON use the blocking Biome step in CI.
