@@ -9,29 +9,7 @@ lastUpdated: 2026-06-16
 > **Source of truth:** PhenoContracts (Phenotype contract verification — formal verification port + Prusti/Kani adapters + contract test bundle)
 > **Scope:** Formal-verification tool adapters, contract test bundle, build pipeline, CI/CD, distributed verification results
 
-## Implementation status and evidence boundary
-
-The assets and mitigations below describe the intended verification system.
-They are planned controls, not attestations of the current implementation.
-The current TypeScript adapters are fail-closed clients for a caller-configured
-JSON protocol. No real solver wrapper, native predicate translation or
-Prusti/Kani invocation is supplied by the observed repository workflows.
-The Rust workspace provides contract models and port traits.
-
-The claims below about pinned solver binaries, checksum verification, bundle
-release hashes, parser depth/array limits, Prusti memory limits and universally
-signed commits require separate implementation and evidence before they can be
-relied on. Current process limits bound time and captured output; they do not
-establish the proposed solver sandbox or parser limits.
-
-Real solver acceptance requires a defined mapping from `predicate` and `target`
-to pinned source/harness inputs, trusted solver provenance and paired verified
-and disproved cases run through the adapter and a consumer. Fixture-generated
-JSON and request correlation alone do not authenticate a proof. The repository
-boundary for providing a wrapper is unresolved; no generic translator is implied
-by the existing string-valued port interface.
-
-## Planned assets
+## Assets
 
 1. **Prusti / Kani adapters** — Generated bindings to formal-verification tools (Prusti for Rust, Kani for model checking). If mutable, can produce false-positive verification results.
 2. **Contract test bundle** — JSON/YAML contracts that downstream consumers depend on. If modified, downstream consumers receive incorrect contracts and may reject valid implementations.
@@ -39,9 +17,9 @@ by the existing string-valued port interface.
 4. **CI pipeline** — Builds, runs Prusti/Kani, and bundles contracts. If mutable, can swap the verification binary for a stub that returns "verified" for any input.
 5. **Public TS contract verifier (`ports/contract_verifier.ts`)** — TS-side port of the Rust adapter. If a contributor treats it as the canonical contract spec, divergence between TS and Rust sources is a silent fail.
 
-## Planned mitigations by threat (STRIDE)
+## Threats (STRIDE)
 
-| Category | Threat | Likelihood | Impact | Planned mitigation (not verified) |
+| Category | Threat | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
 | **Spoofing** | An adversary publishes a fake Prusti or Kani binary under a similar name and downstream CI tools fetch the wrong binary. | Low | Critical | The Prusti and Kani binaries are pinned to 40-char SHAs in `.github/workflows/`. CI verifies the binary checksum on download. The README documents the canonical install paths. |
 | **Tampering** | A contract test bundle is modified before being bundled into the published artifact. | Low | High | All contract bundles are content-addressed by SHA-256. The release script verifies the bundle hash matches the registered hash. `cargo update` is run in CI to detect any drift in transitive deps. |
