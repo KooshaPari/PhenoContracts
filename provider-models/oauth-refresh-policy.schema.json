@@ -20,9 +20,7 @@
         "type": "integer",
         "minimum": 0
       },
-      "examples": [
-        { "codebuddy": 86400, "copilot": 300 }
-      ]
+      "examples": [{ "codebuddy": 86400, "copilot": 300 }]
     },
     "needs_refresh_predicate": {
       "type": "string",
